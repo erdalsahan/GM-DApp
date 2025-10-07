@@ -1,0 +1,20 @@
+{
+  "frame": {
+    "name": "GM APP",
+    "homeUrl": "https://gm-d-app-ki3w.vercel.app",
+    "iconUrl": "https://gm-d-app-ki3w.vercel.app/icon.png",
+    "version": "1",
+    "imageUrl": "https://gm-d-app-ki3w.vercel.app/image.png",
+    "subtitle": "Say Gm",
+    "webhookUrl": "https://gm-d-app-ki3w.vercel.app/api/webhook",
+    "description": "Everyday say gm",
+    "splashImageUrl": "https://gm-d-app-ki3w.vercel.app/splash.png",
+    "primaryCategory": "social",
+    "splashBackgroundColor": "#ffffff"
+  },
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  }
+}
