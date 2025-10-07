@@ -1,0 +1,9 @@
+{
+  "name": "GM DApp",
+  "slug": "gm-dapp",
+  "description": "Send a GM on Base network!",
+  "iconUrl": "https://gm-dapp.vercel.app/logo192.png",
+  "url": "https://gm-dapp.vercel.app",
+  "platforms": ["web"],
+  "creator": "Erdal ŞAHAN"
+}
