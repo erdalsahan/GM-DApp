@@ -1,7 +1,7 @@
 import { ethers, Contract, parseEther } from "ethers";
 import './GM.css';
 
-const CONTRACT_ADDRESS = "0x90d26d080A621001E2675b45f17509c9cb3Fca6E";
+const CONTRACT_ADDRESS = "0x1c7E6832199883ffF593b111ee8b1ce974c7dB67";
 const ABI = [
   "function sendGM(string calldata message) external payable",
   "function lastMessage(address) view returns (string)",
