@@ -8,7 +8,7 @@
     "version": "1",
     "name": "GM Mini App",                
     "description": "Farcaster’da GM mesajları göndermek için Mini App", 
-    "iconUrl": "https://gm-d-app.vercel.app/icon.png",   
+    "iconUrl": "https://gm-d-app.vercel.app/Logo.png",   
     "homeUrl": "https://gm-d-app.vercel.app",            
     "canonicalDomain": "gm-d-app.vercel.app",            
     "requiredChains": ["eip155:8453"],              
