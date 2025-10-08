@@ -1,0 +1,21 @@
+{
+  "accountAssociation": {
+    "header": "<generated-header>",
+    "payload": "<generated-payload>",
+    "signature": "<generated-signature>"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "My Mini App",                
+    "description": "Açıklaman buraya", 
+    "iconUrl": "https://myapp.com/icon.png",   
+    "homeUrl": "https://myapp.com",            
+    "canonicalDomain": "myapp.com",            
+    "requiredChains": ["eip155:8453"],              
+    "tags": ["miniapp"],                
+    "requiredCapabilities": [                       
+      "actions.ready",
+      "actions.signIn"
+    ]
+  }
+}
