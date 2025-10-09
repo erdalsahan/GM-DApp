@@ -5,6 +5,7 @@ import WalletConnect from './components/WalletConnect';
 import GM from './components/GM';
 import MintNFT from './components/MintNFT';
 import Erc1155 from './components/Erc1155';
+import Erc20 from './components/Erc20';
 function App() {
   const [activeIndex, setActiveIndex] = useState(0); // 0 = GM, 1 = MintNFT
 
@@ -19,11 +20,11 @@ function App() {
   }, []);
 
   const handleNext = () => {
-    setActiveIndex((prev) => (prev === 2 ? 0 : prev + 1));
+    setActiveIndex((prev) => (prev === 3 ? 0 : prev + 1));
   };
 
   const handlePrev = () => {
-    setActiveIndex((prev) => (prev === 0 ? 1 : prev - 1));
+    setActiveIndex((prev) => (prev === 0 ? 3 : prev - 1));
   };
 
   return (
@@ -41,6 +42,9 @@ function App() {
           </div>
           <div className="slider-item">
             <Erc1155/>
+          </div>
+          <div className="slider-item">
+            <Erc20/>
           </div>
         </div>
         <button className="slider-btn right" onClick={handleNext}>▶</button>
