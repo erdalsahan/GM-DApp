@@ -2,20 +2,23 @@ import React, { useState } from 'react';
 import './Erc20.css';
 import { ethers } from 'ethers';
 
-const CONTRACT_ADDRESS = "0x751b0AB0FbaEbB7d5aFf8D754C19a7Ad2D6E4e70";
 const ABI = [
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
-  "function totalSupply() view returns (uint256)"
+  "constructor(string _name, string _symbol, uint256 _initialSupply)"
 ];
 
-const Erc20 = () => {
+const DeployToken = () => {
   const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [symbol, setSymbol] = useState("");
+  const [supply, setSupply] = useState("");
 
-  const handleMint = async () => {
+  const handleDeploy = async () => {
     if (!window.ethereum) {
       alert("Cüzdan bulunamadı!");
       return;
+    }
+    if (!name || !symbol || !supply) {
+      return alert("Lütfen tüm alanları doldurun!");
     }
 
     try {
@@ -26,22 +29,19 @@ const Erc20 = () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      // Kontrat instance
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      // Factory oluştur
+      const factory = new ethers.ContractFactory(ABI,  signer);
 
-      // Kontrat bilgilerini al
-      const tokenName = await contract.name();
-      const tokenSymbol = await contract.symbol();
-      const totalSupply = await contract.totalSupply();
+      // Deploy işlemi
+      const tx = await factory.deploy(name, symbol, ethers.parseUnits(supply, 18));
+      alert("Token deploy ediliyor, bekleyin... ⏳");
 
-      alert(`Token basılıyor!\nAdı: ${tokenName}\nSembol: ${tokenSymbol}\nMiktar: ${ethers.formatUnits(totalSupply, 18)} ${tokenSymbol}`);
+      const contract = await tx.wait();
 
-      // Token zaten owner'a deploy sırasında gitmiş oluyor
-      // Eğer deploy sırasında değilse, mint fonksiyonu eklenmeli
-
+      alert(`Token başarıyla deploy edildi!\nAdres: ${contract.contractAddress}`);
     } catch (error) {
       console.error(error);
-      alert("İşlem başarısız ❌: " + (error?.message || error));
+      alert("Deploy işlemi başarısız ❌: " + (error?.message || error));
     } finally {
       setLoading(false);
     }
@@ -50,16 +50,28 @@ const Erc20 = () => {
   return (
     <div className="gm-container">
       <div className="gm-card">
-        <h1 className="gm-title">Mint Your Base Token 🪙</h1>
-        <p className="gm-subtitle">
-          Tek tıkla token bilgileriniz görüntülenecek ve owner cüzdanınıza basılacak.
-        </p>
-        <button className="gm-button" onClick={handleMint} disabled={loading}>
-          {loading ? "Mintleniyor..." : "Token Bas 🚀"}
+        <h1 className="gm-title">Deploy Your Own Token 🪙</h1>
+        {/* <input
+          placeholder="Token Adı"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
+        <input
+          placeholder="Token Sembolü"
+          value={symbol}
+          onChange={e => setSymbol(e.target.value)}
+        />
+        <input
+          placeholder="Initial Supply"
+          value={supply}
+          onChange={e => setSupply(e.target.value)}
+        /> */}
+        <button className="gm-button" onClick={handleDeploy} disabled={true}>
+          {loading ? "Deploy ediliyor..." : "Token Deploy 🚀"}
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Erc20;
+export default DeployToken;
