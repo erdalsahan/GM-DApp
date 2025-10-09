@@ -7,6 +7,7 @@
   background: linear-gradient(135deg, #FFFBF0, #D6EAF8);
   font-family: 'Arial', sans-serif;
   padding: 20px;
+   z-index: 1000;
 }
 
 /* Card */
@@ -19,6 +20,7 @@
   max-width: 360px;
   width: 100%;
   transition: transform 0.2s ease;
+ 
 }
 
 .gm-card:hover {

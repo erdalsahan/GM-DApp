@@ -3,12 +3,14 @@ import './WalletConnect.css'; // saf CSS
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import { ethers } from "ethers";
 function WalletConnect() {
-  const [connected, setConnected] = useState(false);
+    const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState("");
   const [chainId, setChainId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [domainName, setDomainName] = useState(null);
 
+  // Cüzdanı bağla
   async function connectMetaMask() {
     if (!window.ethereum) {
       alert("MetaMask bulunamadı. Lütfen tarayıcı cüzdanı kurun.");
@@ -17,11 +19,24 @@ function WalletConnect() {
 
     try {
       setLoading(true);
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      setAddress(accounts[0]);
+
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const addr = accounts[0];
+      setAddress(addr);
       setConnected(true);
-      const chain = await window.ethereum.request({ method: "eth_chainId" });
+
+      const chain = await window.ethereum.request({
+        method: "eth_chainId",
+      });
       setChainId(chain);
+
+      // Ethereum mainnet için ENS çözümle
+      if (chain === "0x1") {
+        await resolveENS(addr);
+      }
+
       setShowModal(false);
     } catch (err) {
       console.error(err);
@@ -31,22 +46,48 @@ function WalletConnect() {
     }
   }
 
+  // ENS çözümle
+  async function resolveENS(addr) {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const name = await provider.lookupAddress(addr); // ENS name
+      setDomainName(name);
+    } catch (err) {
+      console.error("ENS adı alınamadı:", err);
+      setDomainName(null);
+    }
+  }
+
   function disconnect() {
     setConnected(false);
     setAddress("");
     setChainId(null);
+    setDomainName(null);
   }
 
+  // Hesap ve chain değişikliklerini dinle
   useEffect(() => {
     if (!window.ethereum) return;
 
-    function handleAccountsChanged(accounts) {
-      if (accounts.length === 0) disconnect();
-      else setAddress(accounts[0]);
+    async function handleAccountsChanged(accounts) {
+      if (accounts.length === 0) {
+        disconnect();
+      } else {
+        const addr = accounts[0];
+        setAddress(addr);
+
+        // Ethereum mainnetse ENS çöz
+        if (chainId === "0x1") {
+          await resolveENS(addr);
+        } else {
+          setDomainName(null);
+        }
+      }
     }
 
     function handleChainChanged(chainId) {
       setChainId(chainId);
+      setDomainName(null); // zincir değişirse domain sıfırla
     }
 
     window.ethereum.on?.("accountsChanged", handleAccountsChanged);
@@ -56,106 +97,71 @@ function WalletConnect() {
       window.ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
       window.ethereum.removeListener?.("chainChanged", handleChainChanged);
     };
-  }, []);
+  }, [chainId]);
 
   function shortAddr(addr) {
     if (!addr) return "";
     return addr.slice(0, 6) + "..." + addr.slice(-4);
   }
-async function connectCoinbase() {
-  try {
-    const APP_NAME = "My DApp";
-    const APP_LOGO_URL = "https://example.com/logo.png";
 
-    const DEFAULT_ETH_JSONRPC_URL = "https://mainnet.base.org"; // Base RPC
-    const DEFAULT_CHAIN_ID = 8453; // Base Mainnet decimal
 
-    // Coinbase Wallet SDK instance
-    const coinbaseWallet = new CoinbaseWalletSDK({
-      appName: APP_NAME,
-      appLogoUrl: APP_LOGO_URL,
-      darkMode: false
-    });
+return (
+  <div className="wc-container">
+    {/* Sağ üstteki Connect butonu */}
+    <div className="wc-topbar">
+      {connected ? (
+        <div className="wc-connected">
+          <span className="wc-address">{shortAddr(address)}</span>
+          <button onClick={disconnect} className="wc-disconnect">
+            Disconnect
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setShowModal(!showModal)}
+          className="wc-connect-btn"
+        >
+          Connect Wallet
+        </button>
+      )}
 
-    // ✅ Correct: makeWeb3Provider expects url and chainId
-    const ethereum = coinbaseWallet.makeWeb3Provider(
-      DEFAULT_ETH_JSONRPC_URL, // JSON RPC URL
-      DEFAULT_CHAIN_ID          // Chain ID decimal
-    );
-
-    // request accounts
-    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    setAddress(accounts[0]);
-    setConnected(true);
-
-    const chain = await ethereum.request({ method: "eth_chainId" });
-    setChainId(chain);
-    setShowModal(false);
-
-    // ethers v6 BrowserProvider ile signer
-    const provider = new ethers.BrowserProvider(ethereum);
-    const signer = await provider.getSigner();
-
-    console.log("Coinbase Wallet bağlandı:", accounts[0]);
-  } catch (err) {
-    console.error(err);
-    alert("Coinbase Wallet bağlanamadı: " + (err.message || err));
-  }
-}
-
-  return (
-    <div className="wc-container">
-      <div className="wc-card">
-        <div className="wc-header">
-          <div>
-            <h3>Connect Wallet</h3>
-            <p>DApp'e bağlanmak için bir cüzdan seçin</p>
+      {/* Sağ üstte açılan panel */}
+      {showModal && !connected && (
+        <div className="wc-dropdown">
+          <div className="wc-dropdown-header">
+            <h4>Choose Wallet</h4>
+            <button onClick={() => setShowModal(false)}>✕</button>
           </div>
-
-          <div>
-            {connected ? (
-              <div className="wc-connected">
-                <span className="wc-address">{shortAddr(address)}</span>
-                <button onClick={disconnect} className="wc-disconnect">Disconnect</button>
-              </div>
-            ) : (
-              <button onClick={() => setShowModal(true)} className="wc-connect-btn">Connect Wallet</button>
-            )}
+          <div className="wc-wallet-buttons">
+            <button onClick={connectMetaMask}>🦊 MetaMask</button>
+            <button disabled>🌐 WalletConnect</button>
+            <button disabled>💼 Coinbase Wallet</button>
           </div>
         </div>
+      )}
+    </div>
 
-        <div className="wc-status">
-          <div>Durum:</div>
-          {connected ? (
-            <>
-              <div>Bağlı: {shortAddr(address)}</div>
-              <div>Chain ID: {chainId}</div>
-            </>
-          ) : (
-            <div>Henüz cüzdan bağlı değil.</div>
-          )}
-        </div>
+    {/* Ortadaki kart */}
+    {/* <div className="wc-card">
+      <h3>Connect Wallet</h3>
+      <p>DApp'e bağlanmak için bir cüzdan seçin</p>
 
-        {showModal && (
-          <div className="wc-modal">
-            <div className="wc-backdrop" onClick={() => setShowModal(false)}></div>
-            <div className="wc-modal-content">
-              <div className="wc-modal-header">
-                <h4>Choose Wallet</h4>
-                <button onClick={() => setShowModal(false)}>✕</button>
-              </div>
-              <div className="wc-wallet-buttons">
-                <button onClick={connectMetaMask}>MetaMask</button>
-                <button disabled={true} onClick={() => alert("WalletConnect placeholder")}>WalletConnect</button>
-                <button disabled={true} onClick={connectCoinbase}>Coinbase Wallet</button>
-
-              </div>
-            </div>
-          </div>
+      <div className="wc-status">
+        <div>Durum:</div>
+        {connected ? (
+          <>
+            <div>Bağlı: {shortAddr(address)}</div>
+            <div>Chain ID: {chainId}</div>
+          </>
+        ) : (
+          <div>Henüz cüzdan bağlı değil.</div>
         )}
       </div>
-    </div>
-  );
+    </div> */}
+  </div>
+);
+
+
 }
 
 export default WalletConnect;
