@@ -36,3 +36,53 @@
     transform: rotate(360deg);
   }
 }
+/* slider ana container */
+.slider-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+/* track */
+.slider-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* her slide */
+.slider-item {
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+/* butonlar */
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.3);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.slider-btn:hover {
+  background: rgba(0,0,0,0.6);
+}
+
+.slider-btn.left {
+  left: 10px;
+}
+
+.slider-btn.right {
+  right: 10px;
+}
+
