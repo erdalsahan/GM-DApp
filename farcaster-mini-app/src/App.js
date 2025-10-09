@@ -4,7 +4,7 @@ import { sdk } from '@farcaster/miniapp-sdk';
 import WalletConnect from './components/WalletConnect';
 import GM from './components/GM';
 import MintNFT from './components/MintNFT';
-
+import Erc1155 from './components/Erc1155';
 function App() {
   const [activeIndex, setActiveIndex] = useState(0); // 0 = GM, 1 = MintNFT
 
@@ -19,7 +19,7 @@ function App() {
   }, []);
 
   const handleNext = () => {
-    setActiveIndex((prev) => (prev === 1 ? 0 : prev + 1));
+    setActiveIndex((prev) => (prev === 2 ? 0 : prev + 1));
   };
 
   const handlePrev = () => {
@@ -38,6 +38,9 @@ function App() {
           </div>
           <div className="slider-item">
             <MintNFT/>
+          </div>
+          <div className="slider-item">
+            <Erc1155/>
           </div>
         </div>
         <button className="slider-btn right" onClick={handleNext}>▶</button>

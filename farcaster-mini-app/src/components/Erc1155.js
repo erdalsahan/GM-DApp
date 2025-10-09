@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import './MintNFT.css';
+import React, { useState } from 'react'
+import './Erc1155.css';
 import { ethers } from 'ethers';
 
-const CONTRACT_ADDRESS = "0x303D8e109143D6e44E5e1DFb0c2A03756C0B998d";
+const CONTRACT_ADDRESS = "0x107DDCC8B338D822dA5247e4C249c0e239d99e74";
 const ABI = [
-  "function mint(string memory _uri) payable",
-  "function mintPrice() view returns (uint256)"
+  "function mint(address to, uint256 id, uint256 amount, string memory tokenURI) external",
+  "function owner() view returns (address)"
 ];
 
-const MintNFT = () => {
-  const [loading, setLoading] = useState(false);
+const Erc1155 = () => {
+    const [loading, setLoading] = useState(false);
+  const [tokenId, setTokenId] = useState(1);
+  const [amount, setAmount] = useState(1);
+  const [tokenURI, setTokenURI] = useState("https://gateway.pinata.cloud/ipfs/YOUR_METADATA.json");
 
   const handleMint = async () => {
     try {
@@ -24,18 +27,20 @@ const MintNFT = () => {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
 
       // Kontrat instance
       const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
-      // Mint fiyatını al
-      const mintPrice = await contract.mintPrice();
-
-      // Örnek tokenURI (sen IPFS linki ile değiştirebilirsin)
-      const tokenURI = "https://gateway.pinata.cloud/ipfs/YOUR_METADATA.json";
+      // Sadece owner mint edebilir, kontrol (opsiyonel)
+      const ownerAddress = await contract.owner();
+      if (ownerAddress.toLowerCase() !== userAddress.toLowerCase()) {
+        alert("Sadece kontrat sahibi mint edebilir!");
+        return;
+      }
 
       // Mint işlemi
-      const tx = await contract.mint(tokenURI, { value: mintPrice });
+      const tx = await contract.mint(userAddress, tokenId, amount, tokenURI);
       alert("Mint işlemi gönderildi, bekleyin... ⏳");
 
       await tx.wait(); // On-chain olmasını bekle
@@ -48,11 +53,10 @@ const MintNFT = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="gm-container">
       <div className="gm-card">
-        <h1 className="gm-title">Mint Your NFT (Erc721)🪙</h1>
+        <h1 className="gm-title">Mint Your NFT (Erc1155)🪙</h1>
         <p className="gm-subtitle">
           Sadece bir tıkla NFT’ni mint et ve cüzdanına gönder.
         </p>
@@ -64,4 +68,4 @@ const MintNFT = () => {
   )
 }
 
-export default MintNFT;
+export default Erc1155
