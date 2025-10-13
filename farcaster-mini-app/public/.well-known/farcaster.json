@@ -17,5 +17,8 @@
       "actions.ready",
       "actions.signIn"
     ]
+  },
+  "baseBuilder": {
+    "allowedAddresses": ["0xD684D39F1a486635D123d0a09C125970cFa33518"]
   }
 }
