@@ -14,16 +14,21 @@ export default function GMCard() {
   if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
   else if (hours >= 18) greeting = "Good Evening";
 
- const handleGmClick = async () => {
+const handleGmClick = async () => {
   if (!window.ethereum) {
     alert("Cüzdan bulunamadı!");
     return;
   }
 
-  const hours = new Date().getHours();
-  let greeting = "Good Morning";
-  if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
-  else if (hours >= 18) greeting = "Good Evening";
+  // ✅ Hangi wallet kullanılıyor kontrol et
+  const walletName = window.ethereum?.name || window.ethereum?.providerInfo?.name;
+  console.log("Aktif Wallet:", walletName);
+
+  if (walletName && walletName.toLowerCase().includes("farcaster")) {
+    console.log("Farcaster Wallet kullanılıyor ✅");
+  } else {
+    console.log("Farcaster Wallet değil, normal provider 🚀");
+  }
 
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -48,23 +53,27 @@ export default function GMCard() {
       }
     }
 
-    const provider = new ethers.BrowserProvider(window.ethereum); // read-only provider
-    const signer = await provider.getSigner();                   // signer ile write mümkün
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
     const gmContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
-    if (!greeting) greeting = "GM ☀️"; // fallback mesaj
+    const hours = new Date().getHours();
+    let greeting = "Good Morning";
+    if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
+    else if (hours >= 18) greeting = "Good Evening";
 
-    const tx = await gmContract.sendGM(greeting); // artık value yok
+    const tx = await gmContract.sendGM(greeting);
     await tx.wait();
 
-    console.log("Transaction on-chain oldu!", tx.hash);
-    alert("GM gönderildi! TxHash: " + tx.hash);
+    alert(`GM gönderildi ✅\nTx Hash: ${tx.hash}`);
+    console.log("Tx başarıyla gönderildi", tx.hash);
 
   } catch (err) {
     console.error(err);
     alert("Hata: " + (err?.message || err));
   }
 };
+
 
   return (
     <div className="gm-container">
