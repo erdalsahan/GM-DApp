@@ -15,28 +15,33 @@ export default function GMCard() {
   else if (hours >= 18) greeting = "Good Evening";
 
 const handleGmClick = async () => {
-  if (!window.ethereum) {
+  let provider;
+
+  // ✅ Birden fazla cüzdan varsa Farcaster'ı seç
+  if (window.ethereum?.providers?.length) {
+    provider = window.ethereum.providers.find(
+      (p) => p.isFarcaster || p.name?.toLowerCase().includes("farcaster")
+    ) || window.ethereum.providers[0];
+  } else {
+    provider = window.ethereum;
+  }
+
+  if (!provider) {
     alert("Cüzdan bulunamadı!");
     return;
   }
 
-  // ✅ Hangi wallet kullanılıyor kontrol et
-  const walletName = window.ethereum?.name || window.ethereum?.providerInfo?.name;
-  console.log("Aktif Wallet:", walletName);
-
-  if (walletName && walletName.toLowerCase().includes("farcaster")) {
-    console.log("Farcaster Wallet kullanılıyor ✅");
-  } else {
-    console.log("Farcaster Wallet değil, normal provider 🚀");
-  }
+  // 🔸 Cüzdan ismini logla
+  const walletName = provider.name || (provider.isFarcaster ? "Farcaster" : "Bilinmiyor");
+  console.log("Aktif Cüzdan:", walletName);
 
   try {
-    await window.ethereum.request({ method: "eth_requestAccounts" });
+    await provider.request({ method: "eth_requestAccounts" });
 
-    const chainId = await window.ethereum.request({ method: "eth_chainId" });
+    const chainId = await provider.request({ method: "eth_chainId" });
     if (chainId !== "0x2105") {
       try {
-        await window.ethereum.request({
+        await provider.request({
           method: "wallet_addEthereumChain",
           params: [{
             chainId: "0x2105",
@@ -53,8 +58,8 @@ const handleGmClick = async () => {
       }
     }
 
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    const signer = await ethersProvider.getSigner();
     const gmContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
     const hours = new Date().getHours();
@@ -67,7 +72,6 @@ const handleGmClick = async () => {
 
     alert(`GM gönderildi ✅\nTx Hash: ${tx.hash}`);
     console.log("Tx başarıyla gönderildi", tx.hash);
-
   } catch (err) {
     console.error(err);
     alert("Hata: " + (err?.message || err));
