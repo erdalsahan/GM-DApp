@@ -1,4 +1,6 @@
-import { ethers, Contract, parseEther } from "ethers";
+import { useEffect, useState } from "react";
+import { ethers, Contract } from "ethers";
+import { sdk } from "@farcaster/miniapp-sdk";  // SDK’yı projene dahil etmelisin
 import './GM.css';
 
 const CONTRACT_ADDRESS = "0x2D8A50649B05e6DFFC821676919e99A3a3528488";
@@ -9,39 +11,37 @@ const ABI = [
 ];
 
 export default function GMCard() {
-  const hours = new Date().getHours();
-  let greeting = "Good Morning";
-  if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
-  else if (hours >= 18) greeting = "Good Evening";
+  const [ethProvider, setEthProvider] = useState(null);
 
-const handleGmClick = async () => {
-  let provider;
+  useEffect(() => {
+    // Mini App ortam hazır olduğunda SDK’yı hazırla
+    const init = async () => {
+      await sdk.actions.ready();  // Splash ekranı gizlemek için
+      const provider = await sdk.wallet.getEthereumProvider();
+      if (!provider) {
+        console.error("Farcaster sağlanan Ethereum provider alınamadı");
+        return;
+      }
+      setEthProvider(provider);
+    };
 
-  // ✅ Birden fazla cüzdan varsa Farcaster'ı seç
-  if (window.ethereum?.providers?.length) {
-    provider = window.ethereum.providers.find(
-      (p) => p.isFarcaster || p.name?.toLowerCase().includes("farcaster")
-    ) || window.ethereum.providers[0];
-  } else {
-    provider = window.ethereum;
-  }
+    init();
+  }, []);
 
-  if (!provider) {
-    alert("Cüzdan bulunamadı!");
-    return;
-  }
+  const handleGmClick = async () => {
+    if (!ethProvider) {
+      alert("Cüzdan bağlantısı kurulamadı!");
+      return;
+    }
 
-  // 🔸 Cüzdan ismini logla
-  const walletName = provider.name || (provider.isFarcaster ? "Farcaster" : "Bilinmiyor");
-  console.log("Aktif Cüzdan:", walletName);
+    try {
+      // Hesabı iste
+      await ethProvider.request({ method: "eth_requestAccounts" });
 
-  try {
-    await provider.request({ method: "eth_requestAccounts" });
-
-    const chainId = await provider.request({ method: "eth_chainId" });
-    if (chainId !== "0x2105") {
-      try {
-        await provider.request({
+      const chainId = await ethProvider.request({ method: "eth_chainId" });
+      if (chainId !== "0x2105") {
+        // Ağı ekle / geç
+        await ethProvider.request({
           method: "wallet_addEthereumChain",
           params: [{
             chainId: "0x2105",
@@ -51,33 +51,35 @@ const handleGmClick = async () => {
             blockExplorerUrls: ["https://basescan.org"],
           }]
         });
-      } catch (addError) {
-        console.error("Ağı ekleyemedik:", addError);
-        alert("Base ağına geçiş yapılmadı.");
-        return;
       }
+
+      // ethers ile provider’ı wrap et
+      const ethersProvider = new ethers.BrowserProvider(ethProvider);
+      const signer = await ethersProvider.getSigner();
+      const gmContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      // Mesaj hazırlama
+      const hours = new Date().getHours();
+      let greeting = "Good Morning";
+      if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
+      else if (hours >= 18) greeting = "Good Evening";
+
+      const tx = await gmContract.sendGM(greeting);
+      await tx.wait();
+
+      alert(`GM gönderildi ✅\nTx Hash: ${tx.hash}`);
+      console.log("Transaction başarılı:", tx.hash);
+    } catch (err) {
+      console.error(err);
+      alert("Hata: " + (err?.message || err));
     }
+  };
 
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    const signer = await ethersProvider.getSigner();
-    const gmContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-
-    const hours = new Date().getHours();
-    let greeting = "Good Morning";
-    if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
-    else if (hours >= 18) greeting = "Good Evening";
-
-    const tx = await gmContract.sendGM(greeting);
-    await tx.wait();
-
-    alert(`GM gönderildi ✅\nTx Hash: ${tx.hash}`);
-    console.log("Tx başarıyla gönderildi", tx.hash);
-  } catch (err) {
-    console.error(err);
-    alert("Hata: " + (err?.message || err));
-  }
-};
-
+  // Zaman temelli greeting (aynı senin önceki kod)
+  const hours = new Date().getHours();
+  let greeting = "Good Morning";
+  if (hours >= 12 && hours < 18) greeting = "Good Afternoon";
+  else if (hours >= 18) greeting = "Good Evening";
 
   return (
     <div className="gm-container">
