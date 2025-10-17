@@ -6,6 +6,7 @@ import GM from './components/GM';
 import MintNFT from './components/MintNFT';
 import Erc1155 from './components/Erc1155';
 import Erc20 from './components/Erc20';
+import { AutoConnect } from "@coinbase/onchainkit/minikit";
 function App() {
   const [activeIndex, setActiveIndex] = useState(0); // 0 = GM, 1 = MintNFT
 
@@ -28,7 +29,8 @@ function App() {
   };
 
   return (
-    <div className='App'>
+    <AutoConnect>
+<div className='App'>
       <WalletConnect/>
       
       <div className="slider-container">
@@ -50,6 +52,8 @@ function App() {
         <button className="slider-btn right" onClick={handleNext}>▶</button>
       </div>
     </div>
+    </AutoConnect>
+    
   );
 }
 
