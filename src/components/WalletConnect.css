@@ -1,0 +1,191 @@
+/* Arka plan */
+.wc-container {
+  min-height: 30px;
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  color: #fff;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  position: relative;
+}
+
+/* Sağ üst Connect butonu alanı */
+.wc-topbar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+/* Connect butonu */
+.wc-connect-btn {
+  background: #f5c518;
+  color: #000;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.wc-connect-btn:hover {
+  background: #d9ab00;
+}
+
+/* Bağlı adres */
+.wc-connected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wc-address {
+  background: #333;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.wc-disconnect {
+  background: #e63946;
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.wc-disconnect:hover {
+  background: #c82333;
+}
+
+/* Dropdown panel */
+.wc-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 16px;
+  width: 250px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  animation: dropdownAnim 0.25s ease-out;
+  z-index: 100;
+}
+
+@keyframes dropdownAnim {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown header */
+.wc-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.wc-dropdown-header h4 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.wc-dropdown-header button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.wc-dropdown-header button:hover {
+  color: #fff;
+}
+
+/* Wallet butonları */
+.wc-wallet-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wc-wallet-buttons button {
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.3s;
+}
+
+.wc-wallet-buttons button:nth-child(1) {
+  background: #f5c518;
+  color: #000;
+}
+
+.wc-wallet-buttons button:nth-child(1):hover {
+  background: #d9ab00;
+}
+
+.wc-wallet-buttons button:disabled {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* Ortadaki kart */
+.wc-card {
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  margin: 120px auto 0;
+  text-align: center;
+}
+
+.wc-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+}
+
+.wc-card p {
+  margin: 0 0 20px;
+  color: #aaa;
+}
+
+/* Durum alanı */
+.wc-status {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #ccc;
+}
+
+/* Mobil uyum */
+@media (max-width: 480px) {
+  .wc-dropdown {
+    width: 200px;
+  }
+  .wc-card {
+    margin-top: 100px;
+    padding: 16px;
+  }
+}

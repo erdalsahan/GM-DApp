@@ -1,0 +1,24 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEzNDIyNzksInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg4MTNCNzM4YzljNzNBNUNBMzViODAzNTgyMDg2QjI2NjM1OEY5OWI5In0",
+    "payload": "eyJkb21haW4iOiJnbS1kLWFwcC52ZXJjZWwuYXBwIn0",
+    "signature": "MHg1N2YxNjYzMTlmNTIwMGZjOWVhMTA4NjlmYjU3Yzc5OGExODljMGEyZmFhZTZhMzQyYjQzNTk4ZDQyNGE0MjdjMGZlM2YzNzk5MTYzYTA0MmFmZDJiMmI2MjhkMjUzM2Y1Mzk3NTlkMGNiNGQ1MGI5YzhjYTMwNjFkMGI2MDYwNjFi"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "GM Mini App",                
+    "description": "Farcaster’da GM mesajları göndermek için Mini App", 
+    "iconUrl": "https://gm-d-app.vercel.app/Logo.png",   
+    "homeUrl": "https://gm-d-app.vercel.app",            
+    "canonicalDomain": "gm-d-app.vercel.app",            
+    "requiredChains": ["eip155:8453"],              
+    "tags": ["miniapp","gm","social"],                
+    "requiredCapabilities": [                       
+      "actions.ready",
+      "actions.signIn"
+    ]
+  },
+  "baseBuilder": {
+    "allowedAddresses": ["0xD684D39F1a486635D123d0a09C125970cFa33518"]
+  }
+}
